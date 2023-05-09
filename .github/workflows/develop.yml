@@ -54,8 +54,8 @@ jobs:
   bump-version:
     name: Bump-Maven
     needs:
-      - java-build
-      - java-test
+      - java-maven-build
+      - java-maven-test
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.bump.outputs.version }}
