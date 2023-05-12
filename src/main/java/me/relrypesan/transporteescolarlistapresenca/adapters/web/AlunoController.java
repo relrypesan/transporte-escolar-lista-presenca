@@ -34,9 +34,9 @@ public class AlunoController {
 
     @GetMapping
     public ResponseEntity<Page<?>> listarAlunos(Pageable pageable, @RequestParam Map<String, String> filters) {
-        var listaEscolas = alunoUseCase.listarAlunos(pageable, filters);
+        var listaAlunos = alunoUseCase.listarAlunos(pageable, filters);
 
-        var response = listaEscolas.map(alunoDtoMapper::domainToDto);
+        var response = listaAlunos.map(alunoDtoMapper::domainToDto);
 
         return ResponseEntity.ok(response);
     }
@@ -51,9 +51,9 @@ public class AlunoController {
     @PatchMapping("/{id_aluno}")
     public ResponseEntity<?> atualizarAluno(@PathVariable("id_aluno") String idAluno, @RequestBody AlunoDto alunoDto) {
         alunoDto.setId(idAluno);
-        var escola = alunoDtoMapper.dtoToDomain(alunoDto);
-        escola = alunoUseCase.atualizarAluno(escola);
-        return ResponseEntity.ok(escola);
+        var aluno = alunoDtoMapper.dtoToDomain(alunoDto);
+        aluno = alunoUseCase.atualizarAluno(aluno);
+        return ResponseEntity.ok(aluno);
     }
 
     @DeleteMapping("/{id_aluno}")

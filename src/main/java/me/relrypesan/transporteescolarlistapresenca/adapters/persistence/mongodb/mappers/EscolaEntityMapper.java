@@ -5,7 +5,7 @@ import me.relrypesan.transporteescolarlistapresenca.core.domain.entities.Escola;
 import org.mapstruct.Mapper;
 
 @Mapper
-public interface EscolaMapper {
+public interface EscolaEntityMapper {
 
     Escola entityToDomain(EscolaEntity escolaEntity);
     EscolaEntity domainToEntity(Escola escola);

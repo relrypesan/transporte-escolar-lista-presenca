@@ -4,12 +4,13 @@ import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb
 import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb.entities.ResponsavelEntity;
 import me.relrypesan.transporteescolarlistapresenca.core.domain.entities.Aluno;
 import me.relrypesan.transporteescolarlistapresenca.core.domain.entities.Responsavel;
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
 @Mapper
-public interface AlunoMapper {
+public interface AlunoEntityMapper {
 
     @Mappings({
             @Mapping(target = "pessoa.nome", source = "nome"),
@@ -20,13 +21,7 @@ public interface AlunoMapper {
     })
     ResponsavelEntity map(Responsavel responsavel);
 
-    @Mappings({
-            @Mapping(target = "nome", source = "pessoa.nome"),
-            @Mapping(target = "sexo", source = "pessoa.sexo"),
-            @Mapping(target = "dataNascimento", source = "pessoa.dataNascimento"),
-            @Mapping(target = "endereco", source = "pessoa.endereco"),
-            @Mapping(target = "telefones", source = "pessoa.telefones"),
-    })
+    @InheritInverseConfiguration
     Responsavel map(ResponsavelEntity responsavelEntity);
 
     Aluno entityToDomain(AlunoEntity alunoEntity);

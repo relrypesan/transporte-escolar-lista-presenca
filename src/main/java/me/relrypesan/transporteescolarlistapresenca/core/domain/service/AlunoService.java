@@ -3,7 +3,7 @@ package me.relrypesan.transporteescolarlistapresenca.core.domain.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb.entities.AlunoEntity;
-import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb.mappers.AlunoMapper;
+import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb.mappers.AlunoEntityMapper;
 import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb.repositories.AlunoRepositoryImpl;
 import me.relrypesan.transporteescolarlistapresenca.core.domain.entities.Aluno;
 import me.relrypesan.transporteescolarlistapresenca.core.domain.exceptions.BusinessException;
@@ -23,12 +23,12 @@ import java.util.stream.Collectors;
 public class AlunoService {
 
     private final AlunoRepositoryImpl alunoRepository;
-    private final AlunoMapper alunoMapper;
+    private final AlunoEntityMapper alunoEntityMapper;
 
     public Aluno cadastrarAluno(Aluno escola) {
-        var entity = alunoMapper.domainToEntity(escola);
+        var entity = alunoEntityMapper.domainToEntity(escola);
         entity = alunoRepository.save(entity);
-        return alunoMapper.entityToDomain(entity);
+        return alunoEntityMapper.entityToDomain(entity);
     }
 
     public Page<Aluno> paginarAlunos(Pageable pageable, Map<String, String> filters) {
@@ -38,20 +38,20 @@ public class AlunoService {
         } else {
             pageEntities = alunoRepository.findAll(pageable);
         }
-        return pageEntities.map(alunoMapper::entityToDomain);
+        return pageEntities.map(alunoEntityMapper::entityToDomain);
     }
 
     public List<Aluno> listarAlunos() {
         var entities = alunoRepository.findAll();
         var listaAluno = entities.stream()
-                .map(alunoMapper::entityToDomain)
+                .map(alunoEntityMapper::entityToDomain)
                 .collect(Collectors.toList());
         return listaAluno;
     }
 
     public Optional<Aluno> consultarAluno(String idAluno) {
         var entities = alunoRepository.findById(idAluno);
-        return entities.map(alunoMapper::entityToDomain);
+        return entities.map(alunoEntityMapper::entityToDomain);
     }
 
     public Aluno atualizarAluno(Aluno aluno) {

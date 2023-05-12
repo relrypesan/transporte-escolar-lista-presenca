@@ -2,7 +2,7 @@ package me.relrypesan.transporteescolarlistapresenca.core.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb.mappers.EscolaMapper;
+import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb.mappers.EscolaEntityMapper;
 import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb.repositories.AlunoRepositoryImpl;
 import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb.repositories.EscolaRepositoryImpl;
 import me.relrypesan.transporteescolarlistapresenca.core.domain.entities.Escola;
@@ -21,25 +21,25 @@ public class EscolaService {
 
     private final EscolaRepositoryImpl escolaRepository;
     private final AlunoRepositoryImpl alunoRepository;
-    private final EscolaMapper escolaMapper;
+    private final EscolaEntityMapper escolaEntityMapper;
 
     public Escola cadastrarEscola(Escola escola) {
-        var entity = escolaMapper.domainToEntity(escola);
+        var entity = escolaEntityMapper.domainToEntity(escola);
         entity = escolaRepository.save(entity);
-        return escolaMapper.entityToDomain(entity);
+        return escolaEntityMapper.entityToDomain(entity);
     }
 
     public List<Escola> listarEscolas() {
         var entities = escolaRepository.findAll();
         var listaEscolar = entities.stream()
-                .map(escolaMapper::entityToDomain)
+                .map(escolaEntityMapper::entityToDomain)
                 .collect(Collectors.toList());
         return listaEscolar;
     }
 
     public Optional<Escola> consultarEscola(String idEscola) {
         var entities = escolaRepository.findById(idEscola);
-        return entities.map(escolaMapper::entityToDomain);
+        return entities.map(escolaEntityMapper::entityToDomain);
     }
 
     public Escola atualizarEscola(Escola escola) {
