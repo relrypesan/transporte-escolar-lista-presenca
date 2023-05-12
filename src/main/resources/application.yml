@@ -9,6 +9,9 @@ spring:
     mongodb:
       uri: mongodb+srv://${MONGODB_USER}:${MONGODB_PASS}@${MONGODB_HOST}/?retryWrites=true&w=majority
       database: ${MONGODB_DATABASE}
+    web:
+      pageable:
+        default-page-size: 10
 
 management:
   endpoints:

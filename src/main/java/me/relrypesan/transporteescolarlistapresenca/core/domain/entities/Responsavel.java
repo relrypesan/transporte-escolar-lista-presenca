@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import me.relrypesan.transporteescolarlistapresenca.core.domain.enums.ParentescoEnum;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Pessoa {
+public class Responsavel {
 
     private String id;
     private String nome;
@@ -20,5 +21,7 @@ public class Pessoa {
     private LocalDate dataNascimento;
     private Endereco endereco;
     private List<Telefone> telefones;
+    private ParentescoEnum parentesco;
+    private String observacao;
 
 }

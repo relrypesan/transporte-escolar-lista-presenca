@@ -1,10 +1,12 @@
-package me.relrypesan.transporteescolarlistapresenca.core.domain.entities;
+package me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import me.relrypesan.transporteescolarlistapresenca.core.domain.enums.SexoEnum;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,16 +15,16 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Aluno {
+@Document(collection = "pessoas")
+public class PessoaEntity {
 
+    @Id
     private String id;
+
     private String nome;
     private SexoEnum sexo;
     private LocalDate dataNascimento;
-    private Endereco endereco;
-    private Escola escola;
-    private List<Responsavel> responsaveis;
-    private String qrCode;
-    private String observacao;
+    private EnderecoEntity endereco;
+    private List<TelefoneEntity> telefones;
 
 }

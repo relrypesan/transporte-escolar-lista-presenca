@@ -6,11 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import me.relrypesan.transporteescolarlistapresenca.adapters.web.dtos.AlunoDto;
 import me.relrypesan.transporteescolarlistapresenca.adapters.web.mappers.AlunoDtoMapper;
 import me.relrypesan.transporteescolarlistapresenca.core.usecase.AlunoUseCase;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -31,18 +33,17 @@ public class AlunoController {
     }
 
     @GetMapping
-    public ResponseEntity<?> listarAlunos() {
-        var listaEscolas = alunoUseCase.listarTodasEscola();
-        var response = listaEscolas.stream()
-                .map(alunoDtoMapper::domainToDto)
-                .collect(Collectors.toList());
+    public ResponseEntity<Page<?>> listarAlunos(Pageable pageable, @RequestParam Map<String, String> filters) {
+        var listaEscolas = alunoUseCase.listarAlunos(pageable, filters);
+
+        var response = listaEscolas.map(alunoDtoMapper::domainToDto);
 
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id_aluno}")
     public ResponseEntity<?> consultarAluno(@PathVariable("id_aluno") String idAluno) {
-        var aluno = alunoUseCase.consultarEscola(idAluno);
+        var aluno = alunoUseCase.consultarAluno(idAluno);
         var response = alunoDtoMapper.domainToDto(aluno);
         return ResponseEntity.ok(response);
     }
@@ -51,13 +52,13 @@ public class AlunoController {
     public ResponseEntity<?> atualizarAluno(@PathVariable("id_aluno") String idAluno, @RequestBody AlunoDto alunoDto) {
         alunoDto.setId(idAluno);
         var escola = alunoDtoMapper.dtoToDomain(alunoDto);
-        escola = alunoUseCase.atualizarEscola(escola);
+        escola = alunoUseCase.atualizarAluno(escola);
         return ResponseEntity.ok(escola);
     }
 
     @DeleteMapping("/{id_aluno}")
     public ResponseEntity<?> deletarAluno(@PathVariable("id_aluno") String idAluno) {
-        alunoUseCase.deletarEscola(idAluno);
+        alunoUseCase.deletarAluno(idAluno);
         return ResponseEntity.noContent().build();
     }
 }

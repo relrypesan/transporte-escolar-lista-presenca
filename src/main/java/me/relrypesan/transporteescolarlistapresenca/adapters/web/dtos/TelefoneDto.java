@@ -1,15 +1,13 @@
-package me.relrypesan.transporteescolarlistapresenca.core.domain.entities;
+package me.relrypesan.transporteescolarlistapresenca.adapters.web.dtos;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Telefone {
+public class TelefoneDto {
 
     private String id;
     private String ddi;

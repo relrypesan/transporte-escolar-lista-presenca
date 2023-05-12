@@ -4,36 +4,50 @@ import lombok.RequiredArgsConstructor;
 import me.relrypesan.transporteescolarlistapresenca.core.domain.entities.Aluno;
 import me.relrypesan.transporteescolarlistapresenca.core.domain.exceptions.BusinessException;
 import me.relrypesan.transporteescolarlistapresenca.core.domain.service.AlunoService;
+import me.relrypesan.transporteescolarlistapresenca.core.domain.service.EscolaService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 public class AlunoUseCase {
     private final AlunoService alunoService;
+    private final EscolaService escolaService;
 
     public Aluno cadastrarNovoAluno(Aluno aluno) {
+        if (aluno.getEscola() == null || aluno.getEscola().getId() == null) throw new BusinessException("Deve ser informado o ID escola para cadastrar o Aluno");
+
+        var escolaOptional = escolaService.consultarEscola(aluno.getEscola().getId());
+        if (escolaOptional.isEmpty()) throw new BusinessException(HttpStatus.NOT_FOUND, "ID escola não encontrado");
+
         return alunoService.cadastrarAluno(aluno);
     }
 
-    public List<Aluno> listarTodasEscola() {
-        return alunoService.listarAlunos();
+    public Page<Aluno> listarAlunos(Pageable pageable, Map<String, String> filters) {
+        return alunoService.paginarAlunos(pageable, filters);
     }
 
-    public Aluno consultarEscola(String idAluno) {
+    public Aluno consultarAluno(String idAluno) {
         var alunoOptional = alunoService.consultarAluno(idAluno);
         if (alunoOptional.isEmpty()) throw new BusinessException(HttpStatus.NOT_FOUND, "ID aluno não encontrado");
         return alunoOptional.get();
     }
 
-    public Aluno atualizarEscola(Aluno aluno) {
-        var escolaAtualizada = alunoService.atualizarAluno(aluno);
-        return escolaAtualizada;
+    public Aluno atualizarAluno(Aluno aluno) {
+        if (aluno.getEscola() == null || aluno.getEscola().getId() == null) throw new BusinessException("Deve ser informado o ID escola para cadastrar o Aluno");
+
+        var escolaOptional = escolaService.consultarEscola(aluno.getEscola().getId());
+        if (escolaOptional.isEmpty()) throw new BusinessException(HttpStatus.NOT_FOUND, "ID escola não encontrado");
+
+        var alunoAtualizado = alunoService.atualizarAluno(aluno);
+        return alunoAtualizado;
     }
 
-    public void deletarEscola(String idAluno) {
+    public void deletarAluno(String idAluno) {
         alunoService.deletarAluno(Aluno.builder()
                 .id(idAluno)
                 .build());

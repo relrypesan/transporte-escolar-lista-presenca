@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import me.relrypesan.transporteescolarlistapresenca.core.domain.enums.ParentescoEnum;
 import me.relrypesan.transporteescolarlistapresenca.core.domain.enums.SexoEnum;
 
 import java.time.LocalDate;
@@ -12,7 +13,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AlunoDto {
+public class ReponsavelDto {
     @JsonProperty("id")
     private String id;
     @JsonProperty("nome")
@@ -23,12 +24,10 @@ public class AlunoDto {
     private LocalDate dataNascimento;
     @JsonProperty("endereco")
     private EnderecoDto endereco;
-    @JsonProperty("escola")
-    private EscolaDto escola;
-    @JsonProperty("responsaveis")
-    private List<ReponsavelDto> responsaveis;
-    @JsonProperty("qr_code")
-    private String qrCode;
+    @JsonProperty("telefones")
+    private List<TelefoneDto> telefones;
+    @JsonProperty("parentesco")
+    private ParentescoEnum parentesco;
     @JsonProperty("observacao")
     private String observacao;
 }

@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
@@ -27,5 +28,8 @@ public class AlunoEntity {
     private EnderecoEntity endereco;
     @DBRef
     private EscolaEntity escola;
+    private List<ResponsavelEntity> responsaveis;
+    private String qrCode;
+    private String observacao;
 
 }

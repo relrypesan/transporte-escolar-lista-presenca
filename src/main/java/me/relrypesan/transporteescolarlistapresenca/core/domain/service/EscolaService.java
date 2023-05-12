@@ -3,6 +3,7 @@ package me.relrypesan.transporteescolarlistapresenca.core.domain.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb.mappers.EscolaMapper;
+import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb.repositories.AlunoRepositoryImpl;
 import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb.repositories.EscolaRepositoryImpl;
 import me.relrypesan.transporteescolarlistapresenca.core.domain.entities.Escola;
 import me.relrypesan.transporteescolarlistapresenca.core.domain.exceptions.BusinessException;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 public class EscolaService {
 
     private final EscolaRepositoryImpl escolaRepository;
+    private final AlunoRepositoryImpl alunoRepository;
     private final EscolaMapper escolaMapper;
 
     public Escola cadastrarEscola(Escola escola) {
@@ -54,6 +56,9 @@ public class EscolaService {
 
         var escolaConsultada = consultarEscola(escola.getId());
         if (escolaConsultada.isEmpty()) throw new BusinessException(HttpStatus.NOT_FOUND,"ID da escola informado não foi encontrado: " + escola.getId());
+
+        var listaAlunos = alunoRepository.findByEscolaId(escola.getId());
+        if (!listaAlunos.isEmpty()) throw new BusinessException("ID escola está sendo utilizado por registro de alunos");
 
         escolaRepository.deleteById(escola.getId());
     }
