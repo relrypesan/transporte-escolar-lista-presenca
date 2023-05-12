@@ -86,5 +86,4 @@ jobs:
         with:
           title: "Automated PR from develop to master. version: ${{ needs.bump-version.outputs.version }}"
           commit-message: "Automated commit message. version: ${{ needs.bump-version.outputs.version }}"
-          branch: develop
-          base: master
+          branch: master
