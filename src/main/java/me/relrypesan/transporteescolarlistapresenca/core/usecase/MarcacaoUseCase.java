@@ -29,12 +29,11 @@ public class MarcacaoUseCase {
     }
 
     public Page<Marcacao> listarMarcacoes(Pageable pageable, Map<String, String> filters, String idAluno) {
-        var pageMarcacoes = marcacaoService.paginarMarcacao(pageable, filters, idAluno);
-        return pageMarcacoes;
+        return marcacaoService.paginarMarcacao(pageable, filters, idAluno);
     }
 
-    public Marcacao consultarMarcacao(String idMarcacao) {
-        var marcacaoOptional = marcacaoService.consultarMarcacao(idMarcacao);
+    public Marcacao consultarMarcacao(Marcacao marcacao) {
+        var marcacaoOptional = marcacaoService.consultarMarcacao(marcacao.getId());
         if (marcacaoOptional.isEmpty()) throw new BusinessException(HttpStatus.NOT_FOUND, "ID marcação não encontrado");
         return marcacaoOptional.get();
     }
@@ -45,14 +44,11 @@ public class MarcacaoUseCase {
         var escolaOptional = marcacaoService.consultarMarcacao(marcacao.getAluno().getId());
         if (escolaOptional.isEmpty()) throw new BusinessException(HttpStatus.NOT_FOUND, "ID escola não encontrado");
 
-        var marcacaoAtualizada = marcacaoService.atualizarMarcacao(marcacao);
-        return marcacaoAtualizada;
+        return marcacaoService.atualizarMarcacao(marcacao);
     }
 
-    public void deletarMarcacao(String idMarcacao) {
-        marcacaoService.deletarMarcacao(Marcacao.builder()
-                .id(idMarcacao)
-                .build());
+    public void deletarMarcacao(Marcacao marcacao) {
+        marcacaoService.deletarMarcacao(marcacao);
     }
 
 }

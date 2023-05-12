@@ -43,8 +43,7 @@ public class AlunoUseCase {
         var escolaOptional = escolaService.consultarEscola(aluno.getEscola().getId());
         if (escolaOptional.isEmpty()) throw new BusinessException(HttpStatus.NOT_FOUND, "ID escola não encontrado");
 
-        var alunoAtualizado = alunoService.atualizarAluno(aluno);
-        return alunoAtualizado;
+        return alunoService.atualizarAluno(aluno);
     }
 
     public void deletarAluno(String idAluno) {

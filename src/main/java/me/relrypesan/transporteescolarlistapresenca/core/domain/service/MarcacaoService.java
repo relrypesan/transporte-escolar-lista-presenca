@@ -13,10 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -30,14 +28,6 @@ public class MarcacaoService {
         var entity = marcacaoEntityMapper.domainToEntity(marcacao);
         entity = marcacaoRepository.save(entity);
         return marcacaoEntityMapper.entityToDomain(entity);
-    }
-
-    public List<Marcacao> listarMarcacoes() {
-        var entities = marcacaoRepository.findAll();
-        var listaMarcacoes = entities.stream()
-                .map(marcacaoEntityMapper::entityToDomain)
-                .collect(Collectors.toList());
-        return listaMarcacoes;
     }
 
     public Page<Marcacao> paginarMarcacao(Pageable pageable, Map<String, String> filters, String idAluno) {

@@ -12,10 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -39,14 +37,6 @@ public class AlunoService {
             pageEntities = alunoRepository.findAll(pageable);
         }
         return pageEntities.map(alunoEntityMapper::entityToDomain);
-    }
-
-    public List<Aluno> listarAlunos() {
-        var entities = alunoRepository.findAll();
-        var listaAluno = entities.stream()
-                .map(alunoEntityMapper::entityToDomain)
-                .collect(Collectors.toList());
-        return listaAluno;
     }
 
     public Optional<Aluno> consultarAluno(String idAluno) {

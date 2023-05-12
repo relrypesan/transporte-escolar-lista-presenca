@@ -31,10 +31,9 @@ public class EscolaService {
 
     public List<Escola> listarEscolas() {
         var entities = escolaRepository.findAll();
-        var listaEscolar = entities.stream()
+        return entities.stream()
                 .map(escolaEntityMapper::entityToDomain)
                 .collect(Collectors.toList());
-        return listaEscolar;
     }
 
     public Optional<Escola> consultarEscola(String idEscola) {

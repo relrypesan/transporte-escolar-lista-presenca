@@ -3,9 +3,11 @@ package me.relrypesan.transporteescolarlistapresenca.adapters.web;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import me.relrypesan.transporteescolarlistapresenca.adapters.web.dtos.AlunoDto;
 import me.relrypesan.transporteescolarlistapresenca.adapters.web.dtos.MarcacaoDto;
 import me.relrypesan.transporteescolarlistapresenca.adapters.web.mappers.MarcacaoDtoMapper;
 import me.relrypesan.transporteescolarlistapresenca.core.domain.entities.Aluno;
+import me.relrypesan.transporteescolarlistapresenca.core.domain.entities.Marcacao;
 import me.relrypesan.transporteescolarlistapresenca.core.usecase.MarcacaoUseCase;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +35,6 @@ public class MarcacoesController {
                 .build());
         marcacao = marcacaoUseCase.cadastrarNovaMarcacao(marcacao);
         var response = marcacaoDtoMapper.domainToDto(marcacao);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -42,25 +43,30 @@ public class MarcacoesController {
                                                    Pageable pageable,
                                                    @RequestParam Map<String, String> filters) {
         var listaAlunos = marcacaoUseCase.listarMarcacoes(pageable, filters, idAluno);
-
         var response = listaAlunos.map(marcacaoDtoMapper::domainToDto);
-
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id_marcacao}")
     public ResponseEntity<?> consultarMarcacao(@PathVariable("id_aluno") String idAluno,
-                                            @PathVariable("id_marcacao") String idMarcacao) {
-        var marcacao = marcacaoUseCase.consultarMarcacao(idMarcacao);
+                                               @PathVariable("id_marcacao") String idMarcacao) {
+        var marcacao = marcacaoUseCase.consultarMarcacao(Marcacao.builder()
+                .id(idMarcacao)
+                .aluno(Aluno.builder()
+                        .id(idAluno)
+                        .build())
+                .build());
         var response = marcacaoDtoMapper.domainToDto(marcacao);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{id_marcacao}")
     public ResponseEntity<?> atualizarMarcacao(@PathVariable("id_aluno") String idAluno,
-                                            @PathVariable("id_marcacao") String idMarcacao,
-                                            @RequestBody MarcacaoDto marcacaoDto) {
+                                               @PathVariable("id_marcacao") String idMarcacao,
+                                               @RequestBody MarcacaoDto marcacaoDto) {
         marcacaoDto.setId(idMarcacao);
+        marcacaoDto.setAluno(new AlunoDto());
+        marcacaoDto.getAluno().setId(idAluno);
         var marcacao = marcacaoDtoMapper.dtoToDomain(marcacaoDto);
         marcacao = marcacaoUseCase.atualizarMarcacao(marcacao);
         return ResponseEntity.ok(marcacao);
@@ -69,7 +75,13 @@ public class MarcacoesController {
     @DeleteMapping("/{id_marcacao}")
     public ResponseEntity<?> deletarMarcacao(@PathVariable("id_aluno") String idAluno,
                                              @PathVariable("id_marcacao") String idMarcacao) {
-        marcacaoUseCase.deletarMarcacao(idMarcacao);
+        var marcacao = Marcacao.builder()
+                .id(idMarcacao)
+                .aluno(Aluno.builder()
+                        .id(idAluno)
+                        .build())
+                .build();
+        marcacaoUseCase.deletarMarcacao(marcacao);
         return ResponseEntity.noContent().build();
     }
 }
