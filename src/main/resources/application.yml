@@ -1,6 +1,6 @@
 
 server:
-  port: 9050
+  port: ${SERVER_PORT}
   servlet:
     context-path: /telp
 
