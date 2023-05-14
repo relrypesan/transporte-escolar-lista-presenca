@@ -63,6 +63,7 @@ jobs:
       - name: Checkout GitActions
         uses: actions/checkout@v3
 
+      ### usar #major, #minor ou #patch no commit
       - name: Bump Version
         id: bump
         uses: nnichols/maven-version-bump-action@v4
