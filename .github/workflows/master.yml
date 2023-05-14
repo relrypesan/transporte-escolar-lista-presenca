@@ -56,7 +56,7 @@ jobs:
         run: mvn -B -DskipTests=true package --file pom.xml
 
       - name: Criar app.jar
-        run: copy target/transporte-escolar-lista-presenca-*.jar target/app.jar
+        run: cp target/transporte-escolar-lista-presenca-*.jar target/app.jar
 
       - name: Obter TAG
         id: obter-tag
