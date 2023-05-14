@@ -72,6 +72,6 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: "api-telp-v1"
           environment_name: "api-telp-v1-dev"
-          version_label: "0.1.0-"$GITHUB_SHA
+          version_label: "0.1.0-${GITHUB_SHA}"
           region: "sa-east-1"
           deployment_package: "./target/app.jar"
