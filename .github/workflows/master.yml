@@ -66,6 +66,6 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: "api-telp-v1"
           environment_name: "api-telp-v1-dev"
-          version_label: "${{ env.tag_version }}"
+          version_label: "0.1.0-alpha"
           region: "sa-east-1"
           deployment_package: "./target/*.jar"
