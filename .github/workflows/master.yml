@@ -1,4 +1,4 @@
-name: Deploy
+name: [2] Deploy
 
 on:
   push:
@@ -57,7 +57,7 @@ jobs:
 
       - name: Obter TAG
         id: obter-tag
-        run: echo ::set-output name=tag::$(git describe --tags $(git rev-list --tags --max-count=1))
+        run: echo "tag_version=$(git describe --tags $(git rev-list --tags --max-count=1))" >> "$GITHUB_ENV"
 
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v19
@@ -66,6 +66,6 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: "api-telp-v1"
           environment_name: "api-telp-v1-dev"
-          version_label: "${{ steps.obter-tag.outputs.tag }}"
+          version_label: "${{ env.tag_version }}"
           region: "sa-east-1"
           deployment_package: "./target/*.jar"
