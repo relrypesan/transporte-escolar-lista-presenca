@@ -62,6 +62,12 @@ jobs:
         id: obter-tag
         run: echo "tag_version=$(git describe --tags $(git rev-list --tags --max-count=1))" >> "$GITHUB_ENV"
 
+      - name: Imprimir número da execução atual
+        run: echo "O número da execução atual é $GITHUB_RUN_ID"
+
+      - name: Imprimir hash do commit
+        run: echo "O hash do commit é $GITHUB_SHA"
+
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v19
         with:
@@ -69,6 +75,6 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: "api-telp-v1"
           environment_name: "api-telp-v1-dev"
-          version_label: "0.1.0-alpha"
+          version_label: "0.1.0-$GITHUB_RUN_ID"
           region: "sa-east-1"
           deployment_package: "./target/app.jar"
