@@ -37,7 +37,7 @@ jobs:
         run: mvn -B -DskipTests=true package --file pom.xml
 
   deploy:
-    name: Java-Maven Test
+    name: Deploy AWS EB
     needs:
       - java-maven-build
     runs-on: ubuntu-latest
