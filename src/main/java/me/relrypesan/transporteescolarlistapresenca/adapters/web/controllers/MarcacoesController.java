@@ -1,4 +1,4 @@
-package me.relrypesan.transporteescolarlistapresenca.adapters.web;
+package me.relrypesan.transporteescolarlistapresenca.adapters.web.controllers;
 
 
 import lombok.RequiredArgsConstructor;
