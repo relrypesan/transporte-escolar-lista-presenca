@@ -100,14 +100,14 @@ jobs:
       - name: Checkout GitActions
         uses: actions/checkout@v3
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          author: github-actions[bot] <github-actions[bot]@users.noreply.github.co>
-          committer: GitHub <noreply@github.com>
-          title: "Automated PR from release to master. version: ${{ needs.bump-version.outputs.version }}"
-          commit-message: "Automated commit message. version: ${{ needs.bump-version.outputs.version }}"
-          body: "Please review and merge this pull request to deploy the release."
-          branch: "release"
-          base: "master"
+#      - name: Create Pull Request
+#        uses: peter-evans/create-pull-request@v5
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          author: github-actions[bot] <github-actions[bot]@users.noreply.github.co>
+#          committer: GitHub <noreply@github.com>
+#          title: "Automated PR from release to master. version: ${{ needs.bump-version.outputs.version }}"
+#          commit-message: "Automated commit message. version: ${{ needs.bump-version.outputs.version }}"
+#          body: "Please review and merge this pull request to deploy the release."
+#          branch: "release"
+#          base: "master"
