@@ -75,16 +75,25 @@ jobs:
       - name: Print Version
         run: "echo 'New Version: ${{steps.bump.outputs.version}}'"
 
+  create-release:
+    name: Create release
+    needs:
+      - bump-version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitActions
+        uses: actions/checkout@v3
+
       - name: Create release branch
         run: |
           git checkout develop
           git checkout -b release
-          git push origin release
+          git push -f origin release
 
   pr-release-to-master:
     name: PR release to master
     needs:
-      - bump-version
+      - create-release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout GitActions
