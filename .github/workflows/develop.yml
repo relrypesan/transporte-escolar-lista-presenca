@@ -2,9 +2,11 @@ name: "[1] Java CI with Maven"
 
 on:
   push:
-    branches: [ "develop" ]
+    branches:
+      - develop
   pull_request:
-    branches: [ "develop" ]
+    branches:
+      - develop
 
 permissions:
   deployments: write
@@ -73,8 +75,14 @@ jobs:
       - name: Print Version
         run: "echo 'New Version: ${{steps.bump.outputs.version}}'"
 
-  pr-develop-to-master:
-    name: PR develop to master
+      - name: Create release branch
+        run: |
+          git checkout develop
+          git checkout -b release
+          git push origin release
+
+  pr-release-to-master:
+    name: PR release to master
     needs:
       - bump-version
     runs-on: ubuntu-latest
@@ -85,6 +93,9 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
-          title: "Automated PR from develop to master. version: ${{ needs.bump-version.outputs.version }}"
+          title: "Automated PR from release to master. version: ${{ needs.bump-version.outputs.version }}"
           commit-message: "Automated commit message. version: ${{ needs.bump-version.outputs.version }}"
-          branch: master
+          branch: "release"
+          body: "Please review and merge this pull request to deploy the release."
+          base: "master"
+          draft: false
