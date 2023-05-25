@@ -100,12 +100,57 @@ jobs:
       - name: Checkout GitActions
         uses: actions/checkout@v3
 
+      - name: Open pull request
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const github = require('@actions/github');
+            const context = github.context;
+
+            const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+
+            const [owner, repo] = context.repo.owner.split("/");
+            const base = 'master';
+            const head = 'develop';
+
+            octokit.pulls.create({
+              owner: owner,
+              repo: repo,
+              title: 'Pull Request Title',
+              head: head,
+              base: base,
+              body: 'Pull Request Description'
+            });
+#            const { context, github } = require('@actions/github');
+#
+#            async function openPullRequest() {
+#              const owner = context.repo.owner;
+#              const repo = context.repo.repo;
+#              const base = 'master';
+#              const head = 'release';
+#              const title = 'Release branch merge';
+#              const body = 'Please review and merge this pull request to deploy the release.';
+#
+#              const pullRequest = await github.pulls.create({
+#                owner,
+#                repo,
+#                title,
+#                body,
+#                base,
+#                head
+#              });
+#
+#              console.log(`Pull request created: ${pullRequest.data.html_url}`);
+#            }
+#
+#            openPullRequest();
+
+
 #      - name: Create Pull Request
 #        uses: peter-evans/create-pull-request@v5
 #        with:
 #          token: ${{ secrets.GITHUB_TOKEN }}
 #          author: github-actions[bot] <github-actions[bot]@users.noreply.github.co>
-#          committer: GitHub <noreply@github.com>
 #          title: "Automated PR from release to master. version: ${{ needs.bump-version.outputs.version }}"
 #          commit-message: "Automated commit message. version: ${{ needs.bump-version.outputs.version }}"
 #          body: "Please review and merge this pull request to deploy the release."
