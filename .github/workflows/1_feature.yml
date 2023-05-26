@@ -70,15 +70,16 @@ jobs:
         with:
           script: |
             const branchRef = context.payload.ref;
-            const [owner, repo] = context.repo.owner.split("/");
             const base = 'develop';
             const head = branchRef;
+            console.log(`branch: ${branchRef}`);
 
-            github.pulls.create({
-              owner: owner,
-              repo: repo,
-              title: 'Pull Request Title',
+            const pr = await github.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
               head: head,
               base: base,
+              title: 'Pull Request da branch feature para a branch develop',
               body: 'Pull Request Description'
             });
+            console.log(`Pull Request aberto: ${pr.data.html_url}`);
