@@ -1,0 +1,89 @@
+name: "[1] Validação Feature"
+
+on:
+  push:
+    branches:
+      - feature-*
+      - feature/*
+  pull_request:
+    branches:
+      - feature-*
+      - feature/*
+
+permissions:
+  deployments: write
+  contents: write
+  statuses: write
+  actions: write
+  checks: read
+  pull-requests: write
+  issues: write
+  repository-projects: write
+
+jobs:
+  java-maven-build:
+    name: Java-Maven Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitActions
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn -B -DskipTests=true package --file pom.xml
+
+  java-maven-test:
+    name: Java-Maven Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitActions
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Test with Maven
+        run: mvn -B test --file pom.xml
+
+  pr-feature-to-develop:
+    name: PR feature to develop
+    needs:
+      - java-maven-build
+      - java-maven-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitActions
+        uses: actions/checkout@v3
+
+      - name: Open pull request
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const github = require('@actions/github');
+            const context = github.context;
+
+            const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+            
+            const branchRef = context.payload.ref;
+            const [owner, repo] = context.repo.owner.split("/");
+            const base = 'develop';
+            const head = branchRef;
+
+            octokit.pulls.create({
+              owner: owner,
+              repo: repo,
+              title: 'Pull Request Title',
+              head: head,
+              base: base,
+              body: 'Pull Request Description'
+            });
