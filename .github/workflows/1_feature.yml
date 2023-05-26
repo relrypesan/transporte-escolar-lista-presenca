@@ -69,16 +69,12 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const context = github.context;
-
-            const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
-            
             const branchRef = context.payload.ref;
             const [owner, repo] = context.repo.owner.split("/");
             const base = 'develop';
             const head = branchRef;
 
-            octokit.pulls.create({
+            github.pulls.create({
               owner: owner,
               repo: repo,
               title: 'Pull Request Title',
