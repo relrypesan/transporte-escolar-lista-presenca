@@ -71,24 +71,28 @@ jobs:
       - name: Open pull request
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const actionsGithub = require('@actions/github');
-            const ctx = actionsGithub.context;
-            const branch = ctx.payload.ref;
-            const octokit = actionsGithub.getOctokit();
-            
-            async function openPR() {
-              const pr = await octokit.pulls.create({
-                owner: ctx.repo.owner,
-                repo: ctx.repo.repo,
-                title: `Pull Request da branch ${branch} para a branch develop`,
-                head: branch,
-                base: 'develop'
-              });
-              console.log(`Pull Request aberto: ${pr.data.html_url}`);
+            const github = context.github;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            async function createPullRequest() {
+              const base = 'develop';
+              const head = 'feature';
+
+              try {
+                const response = await github.pulls.create({
+                  owner,
+                  repo,
+                  title: 'Pull Request da feature para develop',
+                  head,
+                  base
+                });
+                console.log('Pull request criado:', response.data.html_url);
+              } catch (error) {
+                console.error('Erro ao criar o pull request:', error);
+              }
             }
-            
-            openPR().catch(error => {
-              console.error(error);
-              process.exit(1);
-            });
+
+            createPullRequest();
