@@ -70,12 +70,12 @@ jobs:
         with:
           script: |
             const actionsGithub = require('@actions/github');
-            const context = actionsGithub.context;
-            const branch = context.payload.ref;
+            const ctx = actionsGithub.context;
+            const branch = ctx.payload.ref;
             const octokit = actionsGithub.getOctokit();
             const pr = await octokit.pulls.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+              owner: ctx.repo.owner,
+              repo: ctx.repo.repo,
               title: 'Pull Request da branch feature para a branch develop',
               body: 'Pull Request Description'
               head: branch,
