@@ -73,13 +73,19 @@ jobs:
             const ctx = actionsGithub.context;
             const branch = ctx.payload.ref;
             const octokit = actionsGithub.getOctokit();
-            const pr = await octokit.pulls.create({
-              owner: ctx.repo.owner,
-              repo: ctx.repo.repo,
-              title: 'Pull Request da branch feature para a branch develop',
-              body: 'Pull Request Description'
-              head: branch,
-              base: 'develop'
+            
+            async function openPR() {
+              const pr = await octokit.pulls.create({
+                owner: ctx.repo.owner,
+                repo: ctx.repo.repo,
+                title: `Pull Request da branch ${branch} para a branch develop`,
+                head: branch,
+                base: 'develop'
+              });
+              console.log(`Pull Request aberto: ${pr.data.html_url}`);
+            }
+            
+            openPR().catch(error => {
+              console.error(error);
+              process.exit(1);
             });
-
-            console.log(`Pull Request aberto: ${pr.data.html_url}`);
