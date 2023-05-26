@@ -73,7 +73,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const github = context.github;
+            const octokit = context.github;
             const owner = context.repo.owner;
             const repo = context.repo.repo;
 
@@ -82,7 +82,7 @@ jobs:
               const head = 'feature';
 
               try {
-                const response = await github.pulls.create({
+                const response = await octokit.pulls.create({
                   owner,
                   repo,
                   title: 'Pull Request da feature para develop',
