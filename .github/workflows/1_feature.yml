@@ -69,7 +69,6 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const github = require('@actions/github');
             const context = github.context;
 
             const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
