@@ -74,7 +74,7 @@ jobs:
             const base = 'develop';
             const head = branchRef;
 
-            github.pulls.create({
+            octokit.pulls.create({
               owner: owner,
               repo: repo,
               title: 'Pull Request Title',
