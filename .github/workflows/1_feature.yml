@@ -69,8 +69,6 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const context = github.context;
-
             const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
             
             const branchRef = context.payload.ref;
