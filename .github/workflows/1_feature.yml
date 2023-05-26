@@ -69,17 +69,17 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const branchRef = context.payload.ref;
-            const base = 'develop';
-            const head = branchRef;
-            console.log(`branch: ${branchRef}`);
-
-            const pr = await github.pulls.create({
+            const github = require('@actions/github');
+            const context = github.context;
+            const branch = context.payload.ref;
+            const octokit = github.getOctokit();
+            const pr = await octokit.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              head: head,
-              base: base,
               title: 'Pull Request da branch feature para a branch develop',
               body: 'Pull Request Description'
+              head: branch,
+              base: 'develop'
             });
+
             console.log(`Pull Request aberto: ${pr.data.html_url}`);
