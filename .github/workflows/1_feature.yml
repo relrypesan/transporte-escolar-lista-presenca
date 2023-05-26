@@ -65,6 +65,9 @@ jobs:
       - name: Checkout GitActions
         uses: actions/checkout@v3
 
+      - name: Instalar dependências
+        run: npm install @actions/github
+
       - name: Open pull request
         uses: actions/github-script@v6
         with:
