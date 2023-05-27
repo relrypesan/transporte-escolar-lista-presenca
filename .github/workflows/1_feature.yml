@@ -70,23 +70,29 @@ jobs:
         with:
           script: |
             const { repo, owner } = context.repo;
-            const head = '${{ github.ref_name }}';
+            const head = context.ref;
             const base = 'develop';
             const branchName = process.env.GITHUB_REF.replace('refs/heads/', '');
             
             console.log(`branch source: ${branchName}`);
+            console.log(`head: ${head}`);
+            console.log(`base: ${base}`);
             
-            const { data: pulls } = await github.pulls.list({
+            const pulls = await github.rest.pulls.list({
               owner,
               repo,
               head,
-              base
+              base,
+              state: 'open',
             });
             
             // Verifica se existe PR aberto entre as branch's 
-            if (pulls.length == 0) {
+            if (pulls.data.length == 0) {
               const title = `PR automatico ${branchName} -> ${base}`;
-              const body = `Este PR foi aberto automaticamente pelo GitHub Actions.`;
+              const body = [
+                `Este PR foi aberto automaticamente pelo GitHub Actions.`,
+                `Criado pelo Job: ${context.job}`,
+              ].join('\n');
             
               // Cria um PR da branch 'head' para a branch 'base'
               const result = await github.rest.pulls.create({
@@ -100,5 +106,19 @@ jobs:
             
               console.log(`PR criado: ${result.data.html_url}`);
             } else {
+              const existingPR = pulls.data[0];
+              
+              // Atualiza PR existente aberto com informações deste Job
+              const result = await github.rest.pulls.update({
+                owner,
+                repo,
+                pull_number: existingPR.number,
+                body: [
+                  existingPR.body,
+                  `Atualizado pelo Job: ${context.job}`,
+                ].join('\n'),
+              });
+              
               console.log(`PR entre as branch's já existe!`);
+              console.log(`PR atualizado: ${result.data.html_url}`);
             }
