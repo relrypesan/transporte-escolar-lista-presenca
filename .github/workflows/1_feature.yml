@@ -86,6 +86,10 @@ jobs:
             const actionsNumber = process.env.GITHUB_RUN_NUMBER;
             console.log(`Número do Actions: ${actionsNumber}`);
             
+            // Log do nome do workflow em execução
+            const workflowName = process.env.GITHUB_WORKFLOW;
+            console.log(`Nome do Workflow: ${workflowName}`);
+            
             const pulls = await github.rest.pulls.list({
               owner,
               repo,
@@ -123,7 +127,7 @@ jobs:
                 pull_number: existingPR.number,
                 body: [
                   existingPR.body,
-                  `Atualizado pelo Job: ${context.job}`,
+                  `Atualizado pelo: [Action: ${workflowName} #${actionsNumber}](${jobUrl})`,
                 ].join('\n'),
               });
               
