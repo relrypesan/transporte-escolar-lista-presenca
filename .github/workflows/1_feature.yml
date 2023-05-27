@@ -70,17 +70,35 @@ jobs:
         with:
           script: |
             const { repo, owner } = context.repo;
+            const head = '${{ github.ref_name }}';
+            const base = 'develop';
+            const branchName = process.env.GITHUB_REF.replace('refs/heads/', '');
             
-            console.log(`branch source: ${GITHUB_REF#refs/heads/}`);
-            console.log(`branch source: ${GITHUB_REF#refs/heads/}`);
+            console.log(`branch source: ${branchName}`);
             
-            const result = await github.rest.pulls.create({
-              title: 'Título do Pull Request',
+            const { data: pulls } = await github.pulls.list({
               owner,
               repo,
-              head: '${{ github.ref_name }}',
-              base: 'develop',
-              body: 'Corpo do Pull Request'
+              head,
+              base
             });
-
-            console.log(`Pull Request criado: ${result.data.html_url}`);
+            
+            // Verifica se existe PR aberto entre as branch's 
+            if (pulls.length == 0) {
+              const title = `PR automatico ${branchName} -> ${base}`;
+              const body = `Este PR foi aberto automaticamente pelo GitHub Actions.`;
+            
+              // Cria um PR da branch 'head' para a branch 'base'
+              const result = await github.rest.pulls.create({
+                owner,
+                repo,
+                head,
+                base,
+                title,
+                body
+              });
+            
+              console.log(`PR criado: ${result.data.html_url}`);
+            } else {
+              console.log(`PR entre as branch's já existe!`);
+            }
