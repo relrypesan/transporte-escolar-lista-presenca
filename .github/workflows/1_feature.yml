@@ -57,9 +57,9 @@ jobs:
 
   pr-feature-to-develop:
     name: PR feature to develop
-#    needs:
-#      - java-maven-build
-#      - java-maven-test
+    needs:
+      - java-maven-build
+      - java-maven-test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout GitActions
@@ -68,9 +68,12 @@ jobs:
       - name: Open pull request
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { repo, owner } = context.repo;
+            
+            console.log(`branch source: ${GITHUB_REF#refs/heads/}`);
+            console.log(`branch source: ${GITHUB_REF#refs/heads/}`);
+            
             const result = await github.rest.pulls.create({
               title: 'Título do Pull Request',
               owner,
