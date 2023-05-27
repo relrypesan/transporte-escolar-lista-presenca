@@ -56,7 +56,6 @@ jobs:
 
   bump-version:
     name: Bump-Maven
-    if: ${{ github.event.pull_request.merged == true }}
     needs:
       - java-maven-build
       - java-maven-test
