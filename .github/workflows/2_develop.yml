@@ -1,10 +1,9 @@
-name: "[1] Java CI with Maven"
+name: "[2] Deploy - develop"
 
 on:
-  push:
-    branches:
-      - develop
   pull_request:
+    types:
+      - closed
     branches:
       - develop
 
@@ -21,6 +20,7 @@ permissions:
 jobs:
   java-maven-build:
     name: Java-Maven Build
+    if: ${{ github.event.pull_request.merged == true }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout GitActions
@@ -38,6 +38,7 @@ jobs:
 
   java-maven-test:
     name: Java-Maven Test
+    if: ${{ github.event.pull_request.merged == true }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout GitActions
@@ -55,6 +56,7 @@ jobs:
 
   bump-version:
     name: Bump-Maven
+    if: ${{ github.event.pull_request.merged == true }}
     needs:
       - java-maven-build
       - java-maven-test
@@ -75,8 +77,9 @@ jobs:
       - name: Print Version
         run: "echo 'New Version: ${{steps.bump.outputs.version}}'"
 
-  create-release:
-    name: Create release
+  deploy:
+    name: Deploy AWS EB
+    if: ${{ github.event.pull_request.merged == true }}
     needs:
       - bump-version
     runs-on: ubuntu-latest
@@ -84,17 +87,47 @@ jobs:
       - name: Checkout GitActions
         uses: actions/checkout@v3
 
-      - name: Create release branch
-        run: |
-          sleep 5
-          git checkout develop
-          git checkout -b release
-          git push -f origin release
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
 
-  pr-release-to-master:
-    name: PR release to master
+      - name: Build with Maven
+        run: mvn -B -DskipTests=true package --file pom.xml
+
+      - name: Criar app.jar
+        run: cp target/transporte-escolar-lista-presenca-*.jar target/app.jar
+
+      - name: Obter TAG
+        id: obter-tag
+        run: echo "tag_version=$(git describe --tags $(git rev-list --tags --max-count=1))" >> "$GITHUB_ENV"
+
+      - name: Imprimir número da execução atual
+        run: echo "O número da execução atual é $GITHUB_RUN_ID"
+
+      - name: Imprimir hash do commit
+        run: echo "O hash do commit é $GITHUB_SHA"
+
+      - name: Imprimir versão do bump
+        run: echo "A versão do bump é ${{ steps.bump-version.outputs.version }}"
+
+      - name: Deploy to Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: "api-telp-v1"
+          environment_name: "api-telp-v1-dev"
+          version_label: "${{ steps.bump-version.outputs.version }}-${{ github.sha }}"
+          region: "sa-east-1"
+          deployment_package: "./target/app.jar"
+
+  pr-develop-to-master:
+    name: PR develop to master
     needs:
-      - create-release
+      - deploy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout GitActions
@@ -121,38 +154,3 @@ jobs:
               base: base,
               body: 'Pull Request Description'
             });
-#            const { context, github } = require('@actions/github');
-#
-#            async function openPullRequest() {
-#              const owner = context.repo.owner;
-#              const repo = context.repo.repo;
-#              const base = 'master';
-#              const head = 'release';
-#              const title = 'Release branch merge';
-#              const body = 'Please review and merge this pull request to deploy the release.';
-#
-#              const pullRequest = await github.pulls.create({
-#                owner,
-#                repo,
-#                title,
-#                body,
-#                base,
-#                head
-#              });
-#
-#              console.log(`Pull request created: ${pullRequest.data.html_url}`);
-#            }
-#
-#            openPullRequest();
-
-
-#      - name: Create Pull Request
-#        uses: peter-evans/create-pull-request@v5
-#        with:
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#          author: github-actions[bot] <github-actions[bot]@users.noreply.github.co>
-#          title: "Automated PR from release to master. version: ${{ needs.bump-version.outputs.version }}"
-#          commit-message: "Automated commit message. version: ${{ needs.bump-version.outputs.version }}"
-#          body: "Please review and merge this pull request to deploy the release."
-#          branch: "release"
-#          base: "master"
