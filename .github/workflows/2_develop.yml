@@ -2,6 +2,8 @@ name: "[2] Deploy - develop"
 
 on:
   pull_request:
+    types:
+      - closed
     branches:
       - develop
 
@@ -18,6 +20,7 @@ permissions:
 jobs:
   java-maven-build:
     name: Java-Maven Build
+    if: ${{ github.event.pull_request.merged == true }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout GitActions
@@ -35,6 +38,7 @@ jobs:
 
   java-maven-test:
     name: Java-Maven Test
+    if: ${{ github.event.pull_request.merged == true }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout GitActions
@@ -52,6 +56,7 @@ jobs:
 
   bump-version:
     name: Bump-Maven
+    if: ${{ github.event.pull_request.merged == true }}
     needs:
       - java-maven-build
       - java-maven-test
@@ -74,6 +79,7 @@ jobs:
 
   deploy:
     name: Deploy AWS EB
+    if: ${{ github.event.pull_request.merged == true }}
     needs:
       - bump-version
     runs-on: ubuntu-latest
