@@ -78,6 +78,14 @@ jobs:
             console.log(`head: ${head}`);
             console.log(`base: ${base}`);
             
+            // Log da URL do job em execução
+            const jobUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            console.log(`URL do Job: ${jobUrl}`);
+            
+            // Log do número do Actions do repositório atual
+            const actionsNumber = process.env.GITHUB_RUN_NUMBER;
+            console.log(`Número do Actions: ${actionsNumber}`);
+            
             const pulls = await github.rest.pulls.list({
               owner,
               repo,
