@@ -18,6 +18,8 @@ jobs:
   java-maven-build:
     name: Java-Maven Build
     runs-on: ubuntu-latest
+    outputs:
+      project_version: ${{ steps.get_version.outputs.version }}
     steps:
       - name: Checkout GitActions
         uses: actions/checkout@v3
@@ -31,6 +33,11 @@ jobs:
 
       - name: Build with Maven
         run: mvn -B -DskipTests=true package --file pom.xml
+
+      - name: Obter versão do projeto
+        id: get_version
+        run: |
+          echo "::set-output name=version::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
 
   java-maven-test:
     name: Java-Maven Test
@@ -58,6 +65,10 @@ jobs:
     steps:
       - name: Checkout GitActions
         uses: actions/checkout@v3
+
+      - name: Imprimir versão do projeto
+        run: |
+          echo "A versão do projeto é: ${{ needs.java-maven-build.outputs.project_version }}"
 
       - name: Open pull request
         uses: actions/github-script@v6
