@@ -72,7 +72,7 @@ jobs:
 
   deploy:
     name: Deploy AWS EB - DEV
-    if: ${{ github.event.pull_request.merged == true }}
+    if: false
     needs:
       - bump-version
     runs-on: ubuntu-latest
@@ -104,7 +104,7 @@ jobs:
         run: echo "O hash do commit é $GITHUB_SHA"
 
       - name: Imprimir versão do bump
-        run: echo "A versão do bump é ${{ steps.bump-version.outputs.version }}"
+        run: echo "A versão do bump é ${{ needs.bump-version.outputs.version }}"
 
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
@@ -113,14 +113,15 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: "api-telp-v1"
           environment_name: "api-telp-v1-dev"
-          version_label: "${{ steps.bump-version.outputs.version }}-${{ github.sha }}"
+          version_label: "${{ needs.bump-version.outputs.version }}-${{ github.sha }}"
           region: "sa-east-1"
           deployment_package: "./target/app.jar"
 
   pr-develop-to-master:
     name: PR develop to master
     needs:
-      - deploy
+#      - deploy
+      - bump-version
     runs-on: ubuntu-latest
     steps:
       - name: Checkout GitActions
@@ -145,7 +146,7 @@ jobs:
             
             // Verifica se existe PR aberto entre as branch's 
             if (pulls.data.length == 0) {
-              const title = `PR automatico ${branchName} -> ${base}`;
+              const title = `PR automatico ${branchName} -> ${base} | ${{ needs.bump-version.outputs.version }}`;
               const body = [
                 `Este PR foi aberto automaticamente pelo GitHub Actions.`,
                 `Criado pelo: [Action: ${workflowName} #${actionsNumber}](${jobUrl})`,
