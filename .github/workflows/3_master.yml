@@ -2,22 +2,18 @@ name: "[3] Deploy - master"
 
 on:
   pull_request:
+    types:
+      - closed
     branches:
       - master
 
 permissions:
-  deployments: write
-  contents: write
-  statuses: write
-  actions: write
-  checks: read
-  pull-requests: write
-  issues: write
-  repository-projects: write
+  contents: read
 
 jobs:
   java-maven-build:
     name: Java-Maven Build
+    if: ${{ github.event.pull_request.merged == true }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout GitActions

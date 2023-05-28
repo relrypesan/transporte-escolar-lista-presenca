@@ -11,14 +11,8 @@ on:
       - feature/*
 
 permissions:
-  deployments: write
-  contents: write
-  statuses: write
-  actions: write
-  checks: read
+  contents: read
   pull-requests: write
-  issues: write
-  repository-projects: write
 
 jobs:
   java-maven-build:
@@ -103,7 +97,7 @@ jobs:
               const title = `PR automatico ${branchName} -> ${base}`;
               const body = [
                 `Este PR foi aberto automaticamente pelo GitHub Actions.`,
-                `Criado pelo Job: ${context.job}`,
+                `Criado pelo: [Action: ${workflowName} #${actionsNumber}](${jobUrl})`,
               ].join('\n');
             
               // Cria um PR da branch 'head' para a branch 'base'

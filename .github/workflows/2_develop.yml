@@ -8,14 +8,8 @@ on:
       - develop
 
 permissions:
-  deployments: write
   contents: write
-  statuses: write
-  actions: write
-  checks: read
   pull-requests: write
-  issues: write
-  repository-projects: write
 
 jobs:
   java-maven-build:
@@ -56,7 +50,6 @@ jobs:
 
   bump-version:
     name: Bump-Maven
-    if: ${{ github.event.pull_request.merged == true }}
     needs:
       - java-maven-build
       - java-maven-test
@@ -137,20 +130,52 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const github = require('@actions/github');
-            const context = github.context;
-
-            const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
-
-            const [owner, repo] = context.repo.owner.split("/");
+            const { repo, owner } = context.repo;
+            const head = context.ref;
             const base = 'master';
-            const head = 'develop';
-
-            octokit.pulls.create({
-              owner: owner,
-              repo: repo,
-              title: 'Pull Request Title',
-              head: head,
-              base: base,
-              body: 'Pull Request Description'
+            const branchName = process.env.GITHUB_REF.replace('refs/heads/', '');
+            
+            const pulls = await github.rest.pulls.list({
+              owner,
+              repo,
+              head,
+              base,
+              state: 'open',
             });
+            
+            // Verifica se existe PR aberto entre as branch's 
+            if (pulls.data.length == 0) {
+              const title = `PR automatico ${branchName} -> ${base}`;
+              const body = [
+                `Este PR foi aberto automaticamente pelo GitHub Actions.`,
+                `Criado pelo: [Action: ${workflowName} #${actionsNumber}](${jobUrl})`,
+              ].join('\n');
+              
+              // Cria um PR da branch 'head' para a branch 'base'
+              const result = await github.rest.pulls.create({
+                owner,
+                repo,
+                head,
+                base,
+                title,
+                body
+              });
+              
+              console.log(`PR criado: ${result.data.html_url}`);
+            } else {
+              const existingPR = pulls.data[0];
+              
+              // Atualiza PR existente aberto com informações deste Job
+              const result = await github.rest.pulls.update({
+                owner,
+                repo,
+                pull_number: existingPR.number,
+                body: [
+                  existingPR.body,
+                  `Atualizado pelo: [Action: ${workflowName} #${actionsNumber}](${jobUrl})`,
+                ].join('\n'),
+              });
+              
+              console.log(`PR entre as branch's já existe!`);
+              console.log(`PR atualizado: ${result.data.html_url}`);
+            }
