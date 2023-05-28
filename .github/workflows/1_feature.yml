@@ -14,11 +14,8 @@ permissions:
   deployments: write
   contents: write
   statuses: write
-  actions: write
-  checks: read
   pull-requests: write
   issues: write
-  repository-projects: write
 
 jobs:
   java-maven-build:
