@@ -74,6 +74,8 @@ jobs:
     name: Deploy AWS EB - DEV
     needs:
       - bump-version
+    outputs:
+      version: ${{ needs.bump-version.outputs.version }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout GitActions
@@ -160,7 +162,7 @@ jobs:
             
             // Verifica se existe PR aberto entre as branch's 
             if (pulls.data.length == 0) {
-              const title = `PR automatico ${branchName} -> ${base} | ${{ needs.bump-version.outputs.version }}`;
+              const title = `PR automatico ${branchName} -> ${base} | ${{ needs.deploy.outputs.version }}`;
               const body = [
                 `Este PR foi aberto automaticamente pelo GitHub Actions.`,
                 `Criado pelo: [Action: ${workflowName} #${actionsNumber}](${jobUrl})`,
