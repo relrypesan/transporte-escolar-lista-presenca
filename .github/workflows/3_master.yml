@@ -15,6 +15,8 @@ jobs:
     name: Java-Maven Build
     if: ${{ github.event.pull_request.merged == true }}
     runs-on: ubuntu-latest
+    outputs:
+      project_version: ${{ steps.get_version.outputs.version }}
     steps:
       - name: Checkout GitActions
         uses: actions/checkout@v3
@@ -29,8 +31,13 @@ jobs:
       - name: Build with Maven
         run: mvn -B -DskipTests=true package --file pom.xml
 
+      - name: Obter versão do projeto
+        id: get_version
+        run: |
+          echo "::set-output name=version::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
+
   deploy:
-    name: Deploy AWS EB
+    name: Deploy AWS EB - PROD
     needs:
       - java-maven-build
     runs-on: ubuntu-latest
@@ -61,6 +68,10 @@ jobs:
       - name: Imprimir hash do commit
         run: echo "O hash do commit é $GITHUB_SHA"
 
+      - name: Imprimir versão do projeto
+        run: |
+          echo "A versão do projeto é: ${{ needs.java-maven-build.outputs.project_version }}"
+
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
         with:
@@ -68,6 +79,6 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: "api-telp-v1"
           environment_name: "api-telp-v1-prod"
-          version_label: "${{ steps.bump-version.outputs.version }}"
+          version_label: "${{ needs.java-maven-build.outputs.project_version }}"
           region: "sa-east-1"
           deployment_package: "./target/app.jar"

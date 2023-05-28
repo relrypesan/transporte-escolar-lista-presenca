@@ -71,7 +71,7 @@ jobs:
         run: "echo 'New Version: ${{steps.bump.outputs.version}}'"
 
   deploy:
-    name: Deploy AWS EB
+    name: Deploy AWS EB - DEV
     if: ${{ github.event.pull_request.merged == true }}
     needs:
       - bump-version
