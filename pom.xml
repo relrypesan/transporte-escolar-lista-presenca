@@ -11,7 +11,7 @@
 
     <groupId>me.relrypesan</groupId>
     <artifactId>transporte-escolar-lista-presenca</artifactId>
-    <version>0.2.1</version>
+    <version>0.3.0</version>
     <name>transporte-escolar-lista-presenca</name>
     <description>Projeto para marcação de presença no transporte escolar</description>
 
@@ -71,12 +71,36 @@
             <artifactId>mapstruct</artifactId>
             <version>${mapstruct.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
 
         <!-- Tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <!-- Para trabalhar com PDF -->
+        <dependency>
+            <groupId>com.lowagie</groupId>
+            <artifactId>itext</artifactId>
+            <version>2.1.7</version>
+        </dependency>
+
+        <!-- Para gerar QR Code -->
+        <!-- Para trabalhar com ZXing -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+            <version>3.4.1</version>
         </dependency>
     </dependencies>
 

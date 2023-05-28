@@ -1,0 +1,136 @@
+name: "[1] Validação Feature"
+
+on:
+  push:
+    branches:
+      - feature-*
+      - feature/*
+  pull_request:
+    branches:
+      - feature-*
+      - feature/*
+
+permissions:
+  deployments: write
+  contents: write
+  statuses: write
+  actions: write
+  checks: read
+  pull-requests: write
+  issues: write
+  repository-projects: write
+
+jobs:
+  java-maven-build:
+    name: Java-Maven Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitActions
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn -B -DskipTests=true package --file pom.xml
+
+  java-maven-test:
+    name: Java-Maven Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitActions
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Test with Maven
+        run: mvn -B test --file pom.xml
+
+  pr-feature-to-develop:
+    name: PR feature to develop
+    needs:
+      - java-maven-build
+      - java-maven-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitActions
+        uses: actions/checkout@v3
+
+      - name: Open pull request
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { repo, owner } = context.repo;
+            const head = context.ref;
+            const base = 'develop';
+            const branchName = process.env.GITHUB_REF.replace('refs/heads/', '');
+            
+            console.log(`branch source: ${branchName}`);
+            console.log(`head: ${head}`);
+            console.log(`base: ${base}`);
+            
+            // Log da URL do job em execução
+            const jobUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            console.log(`URL do Job: ${jobUrl}`);
+            
+            // Log do número do Actions do repositório atual
+            const actionsNumber = process.env.GITHUB_RUN_NUMBER;
+            console.log(`Número do Actions: ${actionsNumber}`);
+            
+            // Log do nome do workflow em execução
+            const workflowName = process.env.GITHUB_WORKFLOW;
+            console.log(`Nome do Workflow: ${workflowName}`);
+            
+            const pulls = await github.rest.pulls.list({
+              owner,
+              repo,
+              head,
+              base,
+              state: 'open',
+            });
+            
+            // Verifica se existe PR aberto entre as branch's 
+            if (pulls.data.length == 0) {
+              const title = `PR automatico ${branchName} -> ${base}`;
+              const body = [
+                `Este PR foi aberto automaticamente pelo GitHub Actions.`,
+                `Criado pelo Job: ${context.job}`,
+              ].join('\n');
+            
+              // Cria um PR da branch 'head' para a branch 'base'
+              const result = await github.rest.pulls.create({
+                owner,
+                repo,
+                head,
+                base,
+                title,
+                body
+              });
+            
+              console.log(`PR criado: ${result.data.html_url}`);
+            } else {
+              const existingPR = pulls.data[0];
+              
+              // Atualiza PR existente aberto com informações deste Job
+              const result = await github.rest.pulls.update({
+                owner,
+                repo,
+                pull_number: existingPR.number,
+                body: [
+                  existingPR.body,
+                  `Atualizado pelo: [Action: ${workflowName} #${actionsNumber}](${jobUrl})`,
+                ].join('\n'),
+              });
+              
+              console.log(`PR entre as branch's já existe!`);
+              console.log(`PR atualizado: ${result.data.html_url}`);
+            }

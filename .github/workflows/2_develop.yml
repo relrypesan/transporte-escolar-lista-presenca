@@ -1,0 +1,187 @@
+name: "[2] Deploy - develop"
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - develop
+
+permissions:
+  deployments: write
+  contents: write
+  statuses: write
+  actions: write
+  checks: read
+  pull-requests: write
+  issues: write
+  repository-projects: write
+
+jobs:
+  java-maven-build:
+    name: Java-Maven Build
+    if: ${{ github.event.pull_request.merged == true }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitActions
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn -B -DskipTests=true package --file pom.xml
+
+  java-maven-test:
+    name: Java-Maven Test
+    if: ${{ github.event.pull_request.merged == true }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitActions
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Test with Maven
+        run: mvn -B test --file pom.xml
+
+  bump-version:
+    name: Bump-Maven
+    needs:
+      - java-maven-build
+      - java-maven-test
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.bump.outputs.version }}
+    steps:
+      - name: Checkout GitActions
+        uses: actions/checkout@v3
+
+      ### usar #major, #minor ou #patch no commit
+      - name: Bump Version
+        id: bump
+        uses: nnichols/maven-version-bump-action@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Print Version
+        run: "echo 'New Version: ${{steps.bump.outputs.version}}'"
+
+  deploy:
+    name: Deploy AWS EB
+    if: ${{ github.event.pull_request.merged == true }}
+    needs:
+      - bump-version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitActions
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn -B -DskipTests=true package --file pom.xml
+
+      - name: Criar app.jar
+        run: cp target/transporte-escolar-lista-presenca-*.jar target/app.jar
+
+      - name: Obter TAG
+        id: obter-tag
+        run: echo "tag_version=$(git describe --tags $(git rev-list --tags --max-count=1))" >> "$GITHUB_ENV"
+
+      - name: Imprimir número da execução atual
+        run: echo "O número da execução atual é $GITHUB_RUN_ID"
+
+      - name: Imprimir hash do commit
+        run: echo "O hash do commit é $GITHUB_SHA"
+
+      - name: Imprimir versão do bump
+        run: echo "A versão do bump é ${{ steps.bump-version.outputs.version }}"
+
+      - name: Deploy to Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: "api-telp-v1"
+          environment_name: "api-telp-v1-dev"
+          version_label: "${{ steps.bump-version.outputs.version }}-${{ github.sha }}"
+          region: "sa-east-1"
+          deployment_package: "./target/app.jar"
+
+  pr-develop-to-master:
+    name: PR develop to master
+    needs:
+      - deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitActions
+        uses: actions/checkout@v3
+
+      - name: Open pull request
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { repo, owner } = context.repo;
+            const head = context.ref;
+            const base = 'master';
+            const branchName = process.env.GITHUB_REF.replace('refs/heads/', '');
+            
+            const pulls = await github.rest.pulls.list({
+              owner,
+              repo,
+              head,
+              base,
+              state: 'open',
+            });
+            
+            // Verifica se existe PR aberto entre as branch's 
+            if (pulls.data.length == 0) {
+              const title = `PR automatico ${branchName} -> ${base}`;
+              const body = [
+                `Este PR foi aberto automaticamente pelo GitHub Actions.`,
+                `Criado pelo: [Action: ${workflowName} #${actionsNumber}](${jobUrl})`,
+              ].join('\n');
+              
+              // Cria um PR da branch 'head' para a branch 'base'
+              const result = await github.rest.pulls.create({
+                owner,
+                repo,
+                head,
+                base,
+                title,
+                body
+              });
+              
+              console.log(`PR criado: ${result.data.html_url}`);
+            } else {
+              const existingPR = pulls.data[0];
+              
+              // Atualiza PR existente aberto com informações deste Job
+              const result = await github.rest.pulls.update({
+                owner,
+                repo,
+                pull_number: existingPR.number,
+                body: [
+                  existingPR.body,
+                  `Atualizado pelo: [Action: ${workflowName} #${actionsNumber}](${jobUrl})`,
+                ].join('\n'),
+              });
+              
+              console.log(`PR entre as branch's já existe!`);
+              console.log(`PR atualizado: ${result.data.html_url}`);
+            }
