@@ -136,6 +136,22 @@ jobs:
             const base = 'master';
             const branchName = process.env.GITHUB_REF.replace('refs/heads/', '');
             
+            console.log(`branch source: ${branchName}`);
+            console.log(`head: ${head}`);
+            console.log(`base: ${base}`);
+            
+            // Log da URL do job em execução
+            const jobUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            console.log(`URL do Job: ${jobUrl}`);
+            
+            // Log do número do Actions do repositório atual
+            const actionsNumber = process.env.GITHUB_RUN_NUMBER;
+            console.log(`Número do Actions: ${actionsNumber}`);
+            
+            // Log do nome do workflow em execução
+            const workflowName = process.env.GITHUB_WORKFLOW;
+            console.log(`Nome do Workflow: ${workflowName}`);
+            
             const pulls = await github.rest.pulls.list({
               owner,
               repo,
