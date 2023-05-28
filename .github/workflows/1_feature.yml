@@ -11,11 +11,9 @@ on:
       - feature/*
 
 permissions:
-  deployments: write
   contents: write
   statuses: write
   pull-requests: write
-  issues: write
 
 jobs:
   java-maven-build:
