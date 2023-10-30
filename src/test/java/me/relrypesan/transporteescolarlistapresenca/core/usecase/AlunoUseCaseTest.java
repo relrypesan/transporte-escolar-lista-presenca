@@ -1,8 +1,8 @@
 package me.relrypesan.transporteescolarlistapresenca.core.usecase;
 
 import me.relrypesan.transporteescolarlistapresenca.core.domain.entities.Aluno;
-import me.relrypesan.transporteescolarlistapresenca.core.domain.service.AlunoService;
-import me.relrypesan.transporteescolarlistapresenca.core.domain.service.EscolaService;
+import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb.service.AlunoService;
+import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb.service.EscolaService;
 import me.relrypesan.transporteescolarlistapresenca.utils.AlunoFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -109,6 +109,6 @@ class AlunoUseCaseTest {
 
         alunoUseCase.deletarAluno("aluno-1234");
 
-        verify(alunoService, only()).deletarAluno(any());
+        verify(alunoService, only()).deletarAluno(anyString());
     }
 }

@@ -1,4 +1,4 @@
-package me.relrypesan.transporteescolarlistapresenca.core.domain.service;
+package me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +7,9 @@ import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb
 import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb.repositories.AlunoRepositoryImpl;
 import me.relrypesan.transporteescolarlistapresenca.core.domain.entities.Aluno;
 import me.relrypesan.transporteescolarlistapresenca.core.domain.exceptions.BusinessException;
+import me.relrypesan.transporteescolarlistapresenca.core.domain.ports.aluno.ConsultarAlunoPort;
+import me.relrypesan.transporteescolarlistapresenca.core.domain.ports.aluno.DeletarAlunoPort;
+import me.relrypesan.transporteescolarlistapresenca.core.domain.ports.aluno.SalvarAlunoPort;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -18,17 +21,19 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AlunoService {
+public class AlunoService implements ConsultarAlunoPort, SalvarAlunoPort, DeletarAlunoPort {
 
     private final AlunoRepositoryImpl alunoRepository;
     private final AlunoEntityMapper alunoEntityMapper;
 
+    @Override
     public Aluno cadastrarAluno(Aluno escola) {
         var entity = alunoEntityMapper.domainToEntity(escola);
         entity = alunoRepository.save(entity);
         return alunoEntityMapper.entityToDomain(entity);
     }
 
+    @Override
     public Page<Aluno> paginarAlunos(Pageable pageable, Map<String, String> filters) {
         Page<AlunoEntity> pageEntities;
         if (filters.containsKey("escola.id")) {
@@ -39,11 +44,13 @@ public class AlunoService {
         return pageEntities.map(alunoEntityMapper::entityToDomain);
     }
 
+    @Override
     public Optional<Aluno> consultarAluno(String idAluno) {
         var entities = alunoRepository.findById(idAluno);
         return entities.map(alunoEntityMapper::entityToDomain);
     }
 
+    @Override
     public Aluno atualizarAluno(Aluno aluno) {
         if (aluno.getId() == null) throw new BusinessException("ID aluno deve ser informado.");
 
@@ -53,13 +60,14 @@ public class AlunoService {
         return cadastrarAluno(aluno);
     }
 
-    public void deletarAluno(Aluno aluno) {
-        if (aluno.getId() == null) throw new BusinessException("ID aluno deve ser informado.");
+    @Override
+    public void deletarAluno(String idAluno) {
+        if (idAluno == null) throw new BusinessException("ID aluno deve ser informado.");
 
-        var escolaConsultada = consultarAluno(aluno.getId());
-        if (escolaConsultada.isEmpty()) throw new BusinessException(HttpStatus.NOT_FOUND, "ID da aluno informado não foi encontrado: " + aluno.getId());
+        var escolaConsultada = consultarAluno(idAluno);
+        if (escolaConsultada.isEmpty()) throw new BusinessException(HttpStatus.NOT_FOUND, "ID do aluno informado não foi encontrado: " + idAluno);
 
-        alunoRepository.deleteById(aluno.getId());
+        alunoRepository.deleteById(idAluno);
     }
 
 }

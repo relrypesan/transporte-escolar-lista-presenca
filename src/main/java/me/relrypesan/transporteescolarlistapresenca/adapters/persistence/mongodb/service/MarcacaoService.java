@@ -1,4 +1,4 @@
-package me.relrypesan.transporteescolarlistapresenca.core.domain.service;
+package me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +7,9 @@ import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb
 import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb.repositories.MarcacaoRepositoryImpl;
 import me.relrypesan.transporteescolarlistapresenca.core.domain.entities.Marcacao;
 import me.relrypesan.transporteescolarlistapresenca.core.domain.exceptions.BusinessException;
+import me.relrypesan.transporteescolarlistapresenca.core.domain.ports.marcacao.ConsultarMarcacaoPort;
+import me.relrypesan.transporteescolarlistapresenca.core.domain.ports.marcacao.DeletarMarcacaoPort;
+import me.relrypesan.transporteescolarlistapresenca.core.domain.ports.marcacao.SalvarMarcacaoPort;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -19,7 +22,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MarcacaoService {
+public class MarcacaoService implements ConsultarMarcacaoPort, SalvarMarcacaoPort, DeletarMarcacaoPort {
 
     private final MarcacaoRepositoryImpl marcacaoRepository;
     private final MarcacaoEntityMapper marcacaoEntityMapper;
@@ -54,12 +57,12 @@ public class MarcacaoService {
         return cadastrarMarcacao(marcacao);
     }
 
-    public void deletarMarcacao(Marcacao marcacao) {
-        if (marcacao.getId() == null) throw new BusinessException("ID marcação deve ser informado.");
+    public void deletarMarcacao(String idMarcacao) {
+        if (idMarcacao == null) throw new BusinessException("ID marcação deve ser informado.");
 
-        var marcacaoConsultada = consultarMarcacao(marcacao.getId());
-        if (marcacaoConsultada.isEmpty()) throw new BusinessException(HttpStatus.NOT_FOUND,"ID da marcação informado não foi encontrado: " + marcacao.getId());
+        var marcacaoConsultada = consultarMarcacao(idMarcacao);
+        if (marcacaoConsultada.isEmpty()) throw new BusinessException(HttpStatus.NOT_FOUND,"ID da marcação informado não foi encontrado: " + idMarcacao);
 
-        marcacaoRepository.deleteById(marcacao.getId());
+        marcacaoRepository.deleteById(idMarcacao);
     }
 }
