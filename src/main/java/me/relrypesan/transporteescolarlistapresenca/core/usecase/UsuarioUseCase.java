@@ -9,10 +9,12 @@ import me.relrypesan.transporteescolarlistapresenca.core.domain.ports.usuario.Sa
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Component
@@ -29,7 +31,27 @@ public class UsuarioUseCase {
             throw new BusinessException("Já existe um usuario com este username cadastrado");
         }
 
+        validaCaracteresETamanhoSenha(usuario);
+
         return salvarUsuarioPort.cadastrar(usuario);
+    }
+
+    private void validaCaracteresETamanhoSenha(Usuario usuario) {
+        String senha = usuario.getPassword();
+        if (senha == null) throw new BusinessException("Deve ser informado o 'password' para o cadastro do usuario");
+
+        // Define a regex que permite apenas caracteres alfanuméricos e alguns símbolos especiais
+        String regex = "^[a-zA-Z0-9!@#$%^&*()_+-=<>?]{6,}$";
+
+        // Cria um padrão de regex a partir da string regex
+        Pattern pattern = Pattern.compile(regex);
+
+        // Compara a senha com o padrão de regex
+        if (!pattern.matcher(senha).matches()) {
+            throw new BusinessException("A senha deve conter apenas caracteres a-z, A-Z, 0-9 e/ou simbolos especiais");
+        }
+
+        usuario.setPassword(new BCryptPasswordEncoder().encode(usuario.getPassword()));
     }
 
     public Page<Usuario> listarUsuarios(Pageable pageable, Map<String, String> filters) {
@@ -43,6 +65,7 @@ public class UsuarioUseCase {
     }
 
     public Usuario atualizarUsuario(Usuario usuario) {
+        validaCaracteresETamanhoSenha(usuario);
         return salvarUsuarioPort.atualizar(usuario);
     }
 

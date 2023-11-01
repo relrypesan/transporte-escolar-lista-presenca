@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -28,7 +29,7 @@ public class UsuarioController {
     private final RotaUseCase rotaUseCase;
 
     @PostMapping
-    public ResponseEntity<UsuarioDto> cadastrarUsuario(@RequestBody UsuarioDto usuarioDto) {
+    public ResponseEntity<UsuarioDto> cadastrarUsuario(@RequestBody @Valid UsuarioDto usuarioDto) {
         var usuario = usuarioDtoMapper.dtoToDomain(usuarioDto);
         usuario = usuarioUseCase.cadastrarNovoUsuario(usuario);
         var response = usuarioDtoMapper.domainToDto(usuario);
@@ -47,8 +48,8 @@ public class UsuarioController {
 
     @GetMapping("/{id_usuario}")
     public ResponseEntity<?> consultarUsuario(@PathVariable("id_usuario") String idUsuario) {
-        var escola = usuarioUseCase.consultarUsuario(idUsuario);
-        var response = usuarioDtoMapper.domainToDto(escola);
+        var usuario = usuarioUseCase.consultarUsuario(idUsuario);
+        var response = usuarioDtoMapper.domainToDto(usuario);
         return ResponseEntity.ok(response);
     }
 
@@ -60,7 +61,7 @@ public class UsuarioController {
     }
 
     @PatchMapping("/{id_usuario}")
-    public ResponseEntity<?> atualizarUsuario(@PathVariable("id_usuario") String idUsuario, @RequestBody UsuarioDto usuarioDto) {
+    public ResponseEntity<?> atualizarUsuario(@PathVariable("id_usuario") String idUsuario, @RequestBody @Valid UsuarioDto usuarioDto) {
         usuarioDto.setId(idUsuario);
         var usuario = usuarioDtoMapper.dtoToDomain(usuarioDto);
         usuario = usuarioUseCase.atualizarUsuario(usuario);

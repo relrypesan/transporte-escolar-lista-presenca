@@ -26,3 +26,8 @@ management:
       enabled: true
     prometheus:
       enabled: true
+
+security:
+  token:
+    secret: ${JWT_SECRET:jwt-secret}
+    expires-at: 7200 # seconds 60 * 60 * 2 = 7200 => 2 hours

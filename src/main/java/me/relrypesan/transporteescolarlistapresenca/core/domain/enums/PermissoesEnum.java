@@ -1,5 +1,8 @@
 package me.relrypesan.transporteescolarlistapresenca.core.domain.enums;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 public enum PermissoesEnum {
     CONSULTAR_ALUNO,
     LISTAR_ALUNO,
@@ -20,5 +23,9 @@ public enum PermissoesEnum {
     LISTAR_USUARIO,
     SALVAR_USUARIO,
 
-    ADMIN_MASTER,
+    ADMIN_MASTER;
+
+    public GrantedAuthority getGrantedAuthority() {
+        return new SimpleGrantedAuthority(this.name());
+    }
 }

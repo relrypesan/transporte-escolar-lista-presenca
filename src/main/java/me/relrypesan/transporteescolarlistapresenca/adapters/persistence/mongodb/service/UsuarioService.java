@@ -50,6 +50,7 @@ public class UsuarioService implements ConsultarUsuarioPort, SalvarUsuarioPort, 
         var entities = usuarioRepository.findByUsername(username);
         return entities.map(usuarioEntityMapper::entityToDomain);
     }
+
     @Override
     public Usuario atualizar(Usuario usuario) {
         if (usuario.getId() == null) throw new BusinessException("ID usuario deve ser informado.");

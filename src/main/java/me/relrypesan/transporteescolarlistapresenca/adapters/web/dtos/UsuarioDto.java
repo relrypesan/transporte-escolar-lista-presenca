@@ -9,6 +9,8 @@ import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb
 import me.relrypesan.transporteescolarlistapresenca.core.domain.enums.PermissoesEnum;
 import me.relrypesan.transporteescolarlistapresenca.core.domain.enums.SexoEnum;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -18,8 +20,14 @@ import java.util.List;
 public class UsuarioDto {
     @JsonProperty("id")
     private String id;
+    @NotEmpty
+    @Size(min = 6, max = 20)
     @JsonProperty("username")
     private String username;
+    @NotEmpty
+    @Size(min = 6, max = 20)
+    @JsonProperty("password")
+    private String password;
     @JsonProperty("nome")
     private String nome;
     @JsonProperty("sexo")

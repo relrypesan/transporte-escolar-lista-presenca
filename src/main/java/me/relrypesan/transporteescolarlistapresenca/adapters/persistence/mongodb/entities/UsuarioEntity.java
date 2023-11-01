@@ -20,8 +20,10 @@ public class UsuarioEntity {
     @Id
     private String id;
     private String username;
+    private String password;
     private PessoaEntity pessoa;
     private String observacao;
     private List<PermissoesEnum> permissoes;
+    private Boolean ativado = true;
 
 }

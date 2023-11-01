@@ -8,6 +8,7 @@ import me.relrypesan.transporteescolarlistapresenca.core.domain.exceptions.Busin
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -55,6 +56,18 @@ public class AdviceController {
         }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(errorResponse);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorDto> handlerBusinessException(BadCredentialsException exception) {
+        log.error("Erro de credenciais", exception);
+        var errorResponse = ErrorDto.builder()
+                .status(403)
+                .message("Erro de credenciais")
+                .build();
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(errorResponse);
     }
 
