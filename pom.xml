@@ -11,7 +11,7 @@
 
     <groupId>me.relrypesan</groupId>
     <artifactId>transporte-escolar-lista-presenca</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
     <name>transporte-escolar-lista-presenca</name>
     <description>Projeto para marcação de presença no transporte escolar</description>
 
