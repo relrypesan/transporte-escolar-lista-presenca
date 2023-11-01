@@ -1,6 +1,6 @@
 package me.relrypesan.transporteescolarlistapresenca.core.usecase;
 
-import me.relrypesan.transporteescolarlistapresenca.core.domain.service.EscolaService;
+import me.relrypesan.transporteescolarlistapresenca.adapters.persistence.mongodb.service.EscolaService;
 import me.relrypesan.transporteescolarlistapresenca.utils.EscolaFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,8 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -30,7 +29,7 @@ class EscolaUseCaseTest {
     void cadastrarNovaEscola() {
         var escola = EscolaFactory.criarEscola();
 
-        when(escolaService.cadastrarEscola(any()))
+        when(escolaService.cadastrarNovaEscola(any()))
                 .thenReturn(escola);
 
         var escolaNova = escolaUseCase.cadastrarNovaEscola(escola);
@@ -38,22 +37,22 @@ class EscolaUseCaseTest {
         assertNotNull(escolaNova);
         assertNotNull(escolaNova.getId());
 
-        verify(escolaService, only()).cadastrarEscola(any());
+        verify(escolaService, only()).cadastrarNovaEscola(any());
     }
 
     @Test
     void listarTodasEscola() {
         var escola = EscolaFactory.criarEscola();
 
-        when(escolaService.listarEscolas())
+        when(escolaService.listarTodasEscola())
                 .thenReturn(List.of(escola));
 
         var listaEscolas = escolaUseCase.listarTodasEscola();
 
         assertNotNull(listaEscolas);
-        assertTrue(listaEscolas.size() > 0);
+        assertFalse(listaEscolas.isEmpty());
 
-        verify(escolaService, only()).listarEscolas();
+        verify(escolaService, only()).listarTodasEscola();
     }
 
     @Test
