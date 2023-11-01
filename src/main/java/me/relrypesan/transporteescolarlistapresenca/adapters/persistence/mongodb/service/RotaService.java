@@ -15,8 +15,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -46,6 +48,12 @@ public class RotaService implements ConsultarRotaPort, SalvarRotaPort, DeletarRo
     }
 
     @Override
+    public List<Rota> consultarRotasPorUsuario(String idUsuario) {
+        List<RotaEntity> entities = rotaRepository.findByUsuarioId(idUsuario);
+        return entities.stream().map(rotaEntityMapper::entityToDomain).collect(Collectors.toList());
+    }
+
+    @Override
     public Rota atualizar(Rota rota) {
         if (rota.getId() == null) throw new BusinessException("ID rota deve ser informado.");
 
@@ -59,4 +67,5 @@ public class RotaService implements ConsultarRotaPort, SalvarRotaPort, DeletarRo
     public void deletar(Rota rota) {
 
     }
+
 }

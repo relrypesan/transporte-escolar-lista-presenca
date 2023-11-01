@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -35,6 +36,12 @@ public class RotaUseCase {
 
     public Page<Rota> listarRotas(Pageable pageable, Map<String, String> filters) {
         return consultarRotaPort.paginar(pageable, filters);
+    }
+
+    public List<Rota> listarRotasPorUsuario(String idUsuario) {
+        var usuarioOptional = consultarUsuarioPort.consultar(idUsuario);
+        if (usuarioOptional.isEmpty()) throw new BusinessException(HttpStatus.NOT_FOUND, "ID usuario não encontrado");
+        return consultarRotaPort.consultarRotasPorUsuario(idUsuario);
     }
 
     public Rota consultarRota(String idRota) {

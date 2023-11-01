@@ -37,9 +37,9 @@ public class UsuarioUseCase {
     }
 
     public Usuario consultarUsuario(String idUsuario) {
-        var rotaOptional = consultarUsuarioPort.consultar(idUsuario);
-        if (rotaOptional.isEmpty()) throw new BusinessException(HttpStatus.NOT_FOUND, "ID usuario não encontrado");
-        return rotaOptional.get();
+        var usuarioOptional = consultarUsuarioPort.consultar(idUsuario);
+        if (usuarioOptional.isEmpty()) throw new BusinessException(HttpStatus.NOT_FOUND, "ID usuario não encontrado");
+        return usuarioOptional.get();
     }
 
     public Usuario atualizarUsuario(Usuario usuario) {
