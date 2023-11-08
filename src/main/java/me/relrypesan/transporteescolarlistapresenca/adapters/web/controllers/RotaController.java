@@ -3,7 +3,6 @@ package me.relrypesan.transporteescolarlistapresenca.adapters.web.controllers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.relrypesan.transporteescolarlistapresenca.adapters.web.dtos.RotaDto;
-import me.relrypesan.transporteescolarlistapresenca.adapters.web.dtos.RotaDto;
 import me.relrypesan.transporteescolarlistapresenca.adapters.web.mappers.RotaDtoMapper;
 import me.relrypesan.transporteescolarlistapresenca.core.usecase.RotaUseCase;
 import org.springframework.data.domain.Pageable;
